@@ -1,10 +1,7 @@
 package com.api.beer.dto;
 
 import com.api.beer.enums.BeerType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -12,10 +9,11 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class BeerDTO {
 
     private Long id;
@@ -39,5 +37,6 @@ public class BeerDTO {
     @Enumerated(EnumType.STRING)
     @NotNull
     private BeerType type;
+
 }
 

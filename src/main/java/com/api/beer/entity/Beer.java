@@ -1,16 +1,17 @@
 package com.api.beer.entity;
 
 import com.api.beer.enums.BeerType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Data
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class Beer {
 
     @Id
