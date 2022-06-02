@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -38,5 +40,12 @@ public class BeerService {
         Beer foundBeer = beerRepository.findByName(name)
                 .orElseThrow(() -> new BeerNotFoundException(name));
         return mapper.map(foundBeer,BeerDTO.class);
+    }
+
+    public List<BeerDTO> listAll() {
+        return beerRepository.findAll()
+                .stream()
+                .map( (x) -> mapper.map(x, BeerDTO.class))
+                .collect(Collectors.toList());
     }
 }
