@@ -5,20 +5,24 @@ import com.api.beer.dto.BeerDTO;
 import com.api.beer.entity.Beer;
 import com.api.beer.exception.BeerAlreadyRegisteredException;
 import com.api.beer.exception.BeerNotFoundException;
+import com.api.beer.exception.BeerStockExceededException;
 import com.api.beer.repository.BeerRepository;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.BeanUtils;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BeerServiceTest {
@@ -40,15 +44,15 @@ public class BeerServiceTest {
         BeanUtils.copyProperties(expectedBeerDTO, expectedSavedBeer);
 
         // when
-        Mockito.when(beerRepository.findByName(expectedBeerDTO.getName())).thenReturn(Optional.empty());
-        Mockito.when(beerRepository.save(Mockito.any())).thenReturn(expectedSavedBeer);
+        when(beerRepository.findByName(expectedBeerDTO.getName())).thenReturn(Optional.empty());
+        when(beerRepository.save(any())).thenReturn(expectedSavedBeer);
 
         //then
         BeerDTO createdBeerDTO = beerService.createBeer(expectedBeerDTO);
 
-        MatcherAssert.assertThat(createdBeerDTO.getId(), Matchers.is(Matchers.equalTo(expectedBeerDTO.getId())));
-        MatcherAssert.assertThat(createdBeerDTO.getName(), Matchers.is(Matchers.equalTo(expectedBeerDTO.getName())));
-        MatcherAssert.assertThat(createdBeerDTO.getQuantity(), Matchers.is(Matchers.equalTo(expectedBeerDTO.getQuantity())));
+        assertThat(createdBeerDTO.getId(), is(equalTo(expectedBeerDTO.getId())));
+        assertThat(createdBeerDTO.getName(), is(equalTo(expectedBeerDTO.getName())));
+        assertThat(createdBeerDTO.getQuantity(), is(equalTo(expectedBeerDTO.getQuantity())));
     }
 
 
@@ -60,7 +64,7 @@ public class BeerServiceTest {
         BeanUtils.copyProperties(expectedBeerDTO, duplicatedBeer);
 
         // when
-        Mockito.when(beerRepository.findByName(expectedBeerDTO.getName())).thenReturn(Optional.of(duplicatedBeer));
+        when(beerRepository.findByName(expectedBeerDTO.getName())).thenReturn(Optional.of(duplicatedBeer));
 
         // then
         assertThrows(BeerAlreadyRegisteredException.class, () -> beerService.createBeer(expectedBeerDTO));
@@ -74,10 +78,23 @@ public class BeerServiceTest {
         BeanUtils.copyProperties(expectedFoundBeerDTO, expectedFoundBeer);
 
         // when
-        Mockito.when(beerRepository.findByName(expectedFoundBeer.getName())).thenReturn(Optional.of(expectedFoundBeer));
+        when(beerRepository.findByName(expectedFoundBeer.getName())).thenReturn(Optional.of(expectedFoundBeer));
 
         // then
         BeerDTO foundBeerDTO = beerService.findByName(expectedFoundBeerDTO.getName());
-        MatcherAssert.assertThat(foundBeerDTO, Matchers.is(Matchers.equalTo(expectedFoundBeerDTO)));
+        assertThat(foundBeerDTO, is(equalTo(expectedFoundBeerDTO)));
     }
+
+    @Test
+    void whenNotRegisteredBeerNameIsGivenThenThrowAnException() {
+        // given
+        BeerDTO expectedFoundBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
+
+        // when
+        when(beerRepository.findByName(expectedFoundBeerDTO.getName())).thenReturn(Optional.empty());
+
+        // then
+        assertThrows(BeerNotFoundException.class, () -> beerService.findByName(expectedFoundBeerDTO.getName()));
+    }
+
 }
