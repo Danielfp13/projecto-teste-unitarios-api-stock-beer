@@ -2,6 +2,7 @@ package com.api.beer.controller;
 
 import com.api.beer.dto.BeerDTO;
 import com.api.beer.exception.BeerAlreadyRegisteredException;
+import com.api.beer.exception.BeerNotFoundException;
 import com.api.beer.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,5 +21,10 @@ public class BeerController {
     @ResponseStatus(HttpStatus.CREATED)
     public BeerDTO createBeer(@RequestBody @Valid BeerDTO beerDTO) throws BeerAlreadyRegisteredException {
         return beerService.createBeer(beerDTO);
+    }
+
+    @GetMapping("/{name}")
+    public BeerDTO findByName(@PathVariable String name) throws BeerNotFoundException {
+        return beerService.findByName(name);
     }
 }

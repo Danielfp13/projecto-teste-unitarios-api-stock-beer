@@ -3,6 +3,7 @@ package com.api.beer.service;
 import com.api.beer.dto.BeerDTO;
 import com.api.beer.entity.Beer;
 import com.api.beer.exception.BeerAlreadyRegisteredException;
+import com.api.beer.exception.BeerNotFoundException;
 import com.api.beer.repository.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,5 +32,11 @@ public class BeerService {
         if (optSavedBeer.isPresent()) {
             throw new BeerAlreadyRegisteredException(name);
         }
+    }
+
+    public BeerDTO findByName(String name) throws BeerNotFoundException {
+        Beer foundBeer = beerRepository.findByName(name)
+                .orElseThrow(() -> new BeerNotFoundException(name));
+        return mapper.map(foundBeer,BeerDTO.class);
     }
 }
