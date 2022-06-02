@@ -4,6 +4,7 @@ import com.api.beer.builder.BeerDTOBuilder;
 import com.api.beer.dto.BeerDTO;
 import com.api.beer.entity.Beer;
 import com.api.beer.exception.BeerAlreadyRegisteredException;
+import com.api.beer.exception.BeerNotFoundException;
 import com.api.beer.repository.BeerRepository;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -63,5 +64,20 @@ public class BeerServiceTest {
 
         // then
         assertThrows(BeerAlreadyRegisteredException.class, () -> beerService.createBeer(expectedBeerDTO));
+    }
+
+    @Test
+    void whenValidBeerNameIsGivenThenReturnABeer() throws BeerNotFoundException {
+        // given
+        BeerDTO expectedFoundBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
+        Beer expectedFoundBeer = new Beer();
+        BeanUtils.copyProperties(expectedFoundBeerDTO, expectedFoundBeer);
+
+        // when
+        Mockito.when(beerRepository.findByName(expectedFoundBeer.getName())).thenReturn(Optional.of(expectedFoundBeer));
+
+        // then
+        BeerDTO foundBeerDTO = beerService.findByName(expectedFoundBeerDTO.getName());
+        MatcherAssert.assertThat(foundBeerDTO, Matchers.is(Matchers.equalTo(expectedFoundBeerDTO)));
     }
 }

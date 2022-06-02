@@ -15,8 +15,10 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class BeerDTO {
 
+    @EqualsAndHashCode.Include
     private Long id;
 
     @NotNull
