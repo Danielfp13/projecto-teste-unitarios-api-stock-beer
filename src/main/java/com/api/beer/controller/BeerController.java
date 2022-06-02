@@ -33,4 +33,10 @@ public class BeerController {
     public List<BeerDTO> listBeers() {
         return beerService.listAll();
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Long id) throws BeerNotFoundException {
+        beerService.deleteById(id);
+    }
 }

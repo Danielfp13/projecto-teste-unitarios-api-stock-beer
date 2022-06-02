@@ -48,4 +48,15 @@ public class BeerService {
                 .map( (x) -> mapper.map(x, BeerDTO.class))
                 .collect(Collectors.toList());
     }
+
+    public void deleteById(Long id) throws BeerNotFoundException {
+        verifyIfExists(id);
+        beerRepository.deleteById(id);
+    }
+
+    private Beer verifyIfExists(Long id) throws BeerNotFoundException {
+        return beerRepository.findById(id)
+                .orElseThrow(() -> new BeerNotFoundException(id));
+    }
+
 }
