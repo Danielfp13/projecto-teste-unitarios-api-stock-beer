@@ -1,5 +1,6 @@
 package com.api.beer.dto;
 
+import com.api.beer.entity.Beer;
 import com.api.beer.enums.BeerType;
 import lombok.*;
 
@@ -37,6 +38,15 @@ public class BeerDTO {
     @Enumerated(EnumType.STRING)
     @NotNull
     private BeerType type;
+
+    public BeerDTO(Beer beer){
+        this.id = beer.getId();
+        this.name = beer.getName();
+        this.brand = beer.getBrand();
+        this.max = beer.getMax();
+        this.quantity = beer.getQuantity();
+        this.type = beer.getType();
+    }
 
 }
 

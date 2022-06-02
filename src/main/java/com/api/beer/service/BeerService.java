@@ -6,8 +6,8 @@ import com.api.beer.exception.BeerAlreadyRegisteredException;
 import com.api.beer.exception.BeerNotFoundException;
 import com.api.beer.exception.BeerStockExceededException;
 import com.api.beer.repository.BeerRepository;
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,18 +16,19 @@ import java.util.stream.Collectors;
 
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class BeerService {
 
-    private final BeerRepository beerRepository;
-
-    private final ModelMapper mapper;
+    private BeerRepository beerRepository;
 
     public BeerDTO createBeer(BeerDTO beerDTO) throws BeerAlreadyRegisteredException {
         verifyIfIsAlreadyRegistered(beerDTO.getName());
-        Beer beer = mapper.map(beerDTO, Beer.class);
+        Beer beer = new Beer();
+        BeanUtils.copyProperties(beerDTO, beer);
         Beer savedBeer = beerRepository.save(beer);
-        return mapper.map(savedBeer, BeerDTO.class);
+        BeanUtils.copyProperties(savedBeer, beerDTO);
+        return beerDTO;
+
     }
 
     private void verifyIfIsAlreadyRegistered(String name) throws BeerAlreadyRegisteredException {
@@ -40,13 +41,16 @@ public class BeerService {
     public BeerDTO findByName(String name) throws BeerNotFoundException {
         Beer foundBeer = beerRepository.findByName(name)
                 .orElseThrow(() -> new BeerNotFoundException(name));
-        return mapper.map(foundBeer,BeerDTO.class);
+        BeerDTO beerDTO = new BeerDTO();
+        BeanUtils.copyProperties(foundBeer, beerDTO);
+        return beerDTO;
     }
 
     public List<BeerDTO> listAll() {
+        BeerDTO c = new BeerDTO();
         return beerRepository.findAll()
                 .stream()
-                .map( (x) -> mapper.map(x, BeerDTO.class))
+                .map((x) -> new BeerDTO(x))
                 .collect(Collectors.toList());
     }
 
@@ -66,7 +70,9 @@ public class BeerService {
         if (quantityAfterIncrement <= beerToIncrementStock.getMax()) {
             beerToIncrementStock.setQuantity(beerToIncrementStock.getQuantity() + quantityToIncrement);
             Beer incrementedBeerStock = beerRepository.save(beerToIncrementStock);
-            return mapper.map(incrementedBeerStock, BeerDTO.class);
+            BeerDTO beerDTO = new BeerDTO();
+            BeanUtils.copyProperties(incrementedBeerStock, beerDTO);
+            return beerDTO;
         }
         throw new BeerStockExceededException(id, quantityToIncrement);
     }
